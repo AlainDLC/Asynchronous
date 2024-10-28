@@ -7,6 +7,10 @@ const renderError = function (msg) {
   countriesContainer.style.opacity = 1;
 };
 
+const APIKEY = '115412755108921161771x46303';
+
+// `https://geocode.xyz/51.50354,-0.12768?geoit=json&auth=${APIKEY}`
+
 const renderCountry = function (data, className = '') {
   const name = data.name.common;
   const flag = data.flags.svg;
@@ -31,13 +35,8 @@ const renderCountry = function (data, className = '') {
   countriesContainer.style.opacity = 1;
 };
 
-///////////////////////////////////////
-
-/*
-
-
-const getCountryData = country => {
-  fetch(`https://restcountries.com/v3.1/name/${country}`)
+const whereAmI = (lat, lng) => {
+  fetch(`https://geocode.xyz/${lat},${lng}?geoit=json&auth=${APIKEY}`)
     .then(response => {
       if (!response.ok) {
         throw new Error(`Country not found 🌎 ${response.status}`);
@@ -45,61 +44,25 @@ const getCountryData = country => {
       return response.json();
     })
     .then(data => {
-      renderCountry(data[0]);
-      const neighbour = data[0].borders[0];
-
-      if (!neighbour) return; // Exit if there are no neighbours
-
-      return fetch(`https://restcountries.com/v3.1/alpha/${neighbour}`);
+      return fetch(`https://restcountries.com/v3.1/name/${data.country}`);
     })
     .then(response => {
       if (!response.ok) {
-        throw new Error(`Neighbour not found 🥷 ${response.status}`);
+        throw new Error(`Country not found 🌎 ${response.status}`);
       }
       return response.json();
     })
-    .then(data => renderCountry(data[0], 'neighbour'))
-    .catch(err => {
-      renderError(` ${err} 🧌 Try Again!!!`);
-    })
+    .then(data => renderCountry(data[0]))
+
+    .catch(err => console.log(console.error(`${err.message}`)))
+
     .finally(() => {
       countriesContainer.style.opacity = 1;
     });
 };
 
 btn.addEventListener('click', () => {
-  getCountryData('italy');
-});
-*/
-
-const getJSON = function (url, errorMsg = 'somthing went wrong') {
-  return fetch(url).then(response => {
-    if (!response.ok) {
-      throw new Error(`${errorMsg} 🌎 ${response.status}`);
-    }
-    return response.json();
-  });
-};
-
-const getCountryData = country => {
-  getJSON(`https://restcountries.com/v3.1/name/${country}`, 'Country not found')
-    .then(data => {
-      renderCountry(data[0]);
-      if (!('borders' in data[0])) throw new Error('No neighbour found');
-      const neighbour = data[0].borders[0];
-
-      return getJSON(`https://restcountries.com/v3.1/alpha/${neighbour}`);
-    })
-
-    .then(data => renderCountry(data[0], 'neighbour '))
-    .catch(err => {
-      renderError(` ${err} 🧌 Try Again!!!`);
-    })
-    .finally(() => {
-      countriesContainer.style.opacity = 1;
-    });
-};
-
-btn.addEventListener('click', () => {
-  getCountryData('australia');
+  whereAmI(52.508, 13.381);
+  whereAmI(19.037, 72.873);
+  whereAmI(-33.933, 18.474);
 });

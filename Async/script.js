@@ -1,5 +1,7 @@
 'use strict';
 
+const APIKEY = '115412755108921161771x46303';
+
 const btn = document.querySelector('.btn-country');
 const countriesContainer = document.querySelector('.countries');
 const renderError = function (msg) {
@@ -72,6 +74,7 @@ btn.addEventListener('click', () => {
 });
 */
 
+/*
 const getJSON = function (url, errorMsg = 'somthing went wrong') {
   return fetch(url).then(response => {
     if (!response.ok) {
@@ -103,3 +106,91 @@ const getCountryData = country => {
 btn.addEventListener('click', () => {
   getCountryData('australia');
 });
+*/
+
+// Promise
+
+/*
+const lotteryPromise = new Promise((resolve, reject) => {
+  console.log('Lottory draw is happening 🌎');
+  setTimeout(() => {
+    if (Math.random() >= 0.5) {
+      resolve('You win 😎');
+    } else {
+      reject(new Error('You Lose your money 😂'));
+    }
+  }, 2000);
+});
+
+lotteryPromise.then(res => console.log(res)).catch(err => console.error(err));
+
+// Prosisiifying set Tiomout
+const wait = seconds => {
+  return new Promise(resolve => {
+    setTimeout(resolve, seconds * 1000);
+  });
+};
+
+wait(1)
+  .then(() => {
+    console.log('2 sec');
+  })
+  .then(() => {
+    console.log('3 sec');
+  })
+  .then(() => {
+    console.log('4 sec');
+  })
+  .then(() => {
+    console.log('5 sec');
+  });
+*/
+
+// Promise
+
+const getPosition = () => {
+  return new Promise((resolve, rejected) => {
+    /* navigator.geolocation.getCurrentPosition(
+      position => resolve(position),
+      err => rejected(err)
+    );*/
+
+    navigator.geolocation.getCurrentPosition(resolve, rejected);
+  });
+};
+
+const whereAmI = () => {
+  getPosition()
+    .then(pos => {
+      console.log(pos);
+      const { latitude: lat, longitude: lng } = pos.coords;
+
+      return fetch(
+        `https://geocode.xyz/${lat},${lng}?geoit=json&auth=${APIKEY}`
+      );
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Country not found 🌎 ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => {
+      return fetch(`https://restcountries.com/v3.1/name/${data.country}`);
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error(`Country not found 🌎 ${response.status}`);
+      }
+      return response.json();
+    })
+    .then(data => renderCountry(data[0]))
+
+    .catch(err => console.log(console.error(`${err.message}`)))
+
+    .finally(() => {
+      countriesContainer.style.opacity = 1;
+    });
+};
+
+btn.addEventListener('click', whereAmI);

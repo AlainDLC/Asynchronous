@@ -62,7 +62,5 @@ const whereAmI = (lat, lng) => {
 };
 
 btn.addEventListener('click', () => {
-  whereAmI(52.508, 13.381);
-  whereAmI(19.037, 72.873);
-  whereAmI(-33.933, 18.474);
+  whereAmI(57.6843081, 11.9078702);
 });

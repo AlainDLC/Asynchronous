@@ -30,4 +30,4 @@ wait()
   .then(() => createImage('img/img-2.jpg'))
   .then(() => wait(1))
   .then(() => createImage('img/img-3.jpg'))
-  .catch(new Error(`timer 🧌 ${imgPath}`));
+  .catch(new Error(`error 🧌 ${imgPath}`));

@@ -23,11 +23,24 @@ const wait = seconds => {
   });
 };
 
-wait()
-  .then(() => wait(1))
-  .then(() => createImage('img/img-1.jpg'))
-  .then(() => wait(1))
-  .then(() => createImage('img/img-2.jpg'))
-  .then(() => wait(1))
-  .then(() => createImage('img/img-3.jpg'))
-  .catch(new Error(`error 🧌 ${imgPath}`));
+let currentImg;
+
+createImage('img/img-1.jpg')
+  .then(img => {
+    currentImg = img;
+    return wait(2);
+  })
+  .then(() => {
+    currentImg.style.display = 'none';
+    return createImage('img/img-2.jpg');
+  })
+  .then(img => {
+    currentImg = img;
+    return wait(2);
+  })
+  .then(() => {
+    currentImg.style.display = 'none';
+    return createImage('img/img-3.jpg');
+  })
+
+  .catch(err => console.log(err));

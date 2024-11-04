@@ -75,15 +75,6 @@ btn.addEventListener('click', () => {
 */
 
 /*
-const getJSON = function (url, errorMsg = 'somthing went wrong') {
-  return fetch(url).then(response => {
-    if (!response.ok) {
-      throw new Error(`${errorMsg} 🌎 ${response.status}`);
-    }
-    return response.json();
-  });
-};
-
 const getCountryData = country => {
   getJSON(`https://restcountries.com/v3.1/name/${country}`, 'Country not found')
     .then(data => {
@@ -109,6 +100,15 @@ btn.addEventListener('click', () => {
 */
 
 // Promise
+
+const getJSON = function (url, errorMsg = 'somthing went wrong') {
+  return fetch(url).then(response => {
+    if (!response.ok) {
+      throw new Error(`${errorMsg} 🌎 ${response.status}`);
+    }
+    return response.json();
+  });
+};
 
 /*
 const lotteryPromise = new Promise((resolve, reject) => {
@@ -159,6 +159,7 @@ const getPosition = () => {
   });
 };
 
+/*
 const whereAmI = () => {
   getPosition()
     .then(pos => {
@@ -194,3 +195,104 @@ const whereAmI = () => {
 };
 
 btn.addEventListener('click', whereAmI);
+*/
+
+//   fetch(`https://restcountries.com/v3.1/name/${country}`)
+
+/*
+const whereAmI = async () => {
+  try {
+    const pos = await getPosition();
+    const { latitude: lat, longitude: lng } = pos.coords;
+
+    const resGeo = await fetch(
+      `https://geocode.xyz/${lat},${lng}?geoit=json&auth=${APIKEY}`
+    );
+    if (!resGeo.ok) throw new Error(`buuuu`);
+    const dataGeo = await resGeo.json();
+    console.log(dataGeo);
+
+    const res = await fetch(
+      `https://restcountries.com/v3.1/name/${dataGeo.country}`
+    );
+    if (!res.ok) throw new Error(`buuuu`);
+    const data = await res.json();
+    renderCountry(data[0]);
+
+    return `You are in ${dataGeo.city}, ${dataGeo.country}`;
+  } catch (err) {
+    renderError(err.messege);
+
+    // reject promise
+    throw err;
+  }
+};
+
+(async function () {
+  try {
+    const where = await whereAmI();
+    console.log(where);
+  } catch (err) {
+    console.log(err);
+  }
+})();
+
+*/
+
+/*
+const getThreeCountries = async (c1, c2, c3) => {
+  try {
+    const data = await Promise.all([
+      getJSON(`https://restcountries.com/v3.1/name/${c1}`),
+      getJSON(`https://restcountries.com/v3.1/name/${c2}`),
+      getJSON(`https://restcountries.com/v3.1/name/${c3}`),
+    ]);
+
+    console.log(data.map(d => d[0].capital));
+  } catch (err) {
+    console.error(err.message);
+    throw err;
+  }
+};
+*/
+
+(async function () {
+  try {
+    const res = await Promise.race([
+      getJSON(`https://restcountries.com/v3.1/name/chile`),
+      getJSON(`https://restcountries.com/v3.1/name/sweden`),
+      getJSON(`https://restcountries.com/v3.1/name/norway`),
+    ]);
+    console.log(res[0].name);
+  } catch (err) {
+    console.log(err);
+  }
+})();
+
+const timeout = sec => {
+  return new Promise((_, reject) => {
+    setTimeout(() => {
+      reject(new Error('request took to long'));
+    }, sec * 1000);
+  });
+};
+
+Promise.race([getJSON(`https://restcountries.com/v3.1/name/italy`), timeout(1)])
+  .then(res => console.log(res[0]))
+  .catch(err => console.log(err));
+
+// Promise AllSettled
+
+Promise.allSettled([
+  Promise.resolve('susses'),
+  Promise.reject('error'),
+  Promise.resolve('another susses'),
+]).then(res => console.log(res));
+
+// promise.any
+
+Promise.any([
+  Promise.resolve('wiiii'),
+  Promise.reject('error'),
+  Promise.resolve('another susses'),
+]).then(res => console.log(res));
